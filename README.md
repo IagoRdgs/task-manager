@@ -1,16 +1,20 @@
-# 📝 Task Manager - Full Stack Ecosystem
+# 📝 Task Manager — Full Stack Ecosystem
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Concluído-success?style=for-the-badge" alt="Status">
   <img src="https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel" alt="Deploy">
   <img src="https://img.shields.io/badge/Database-Supabase-3ECF8E?style=for-the-badge&logo=supabase" alt="Database">
+  <img src="https://img.shields.io/badge/API-REST-blue?style=for-the-badge" alt="API REST">
+  <img src="https://img.shields.io/badge/Auth-JWT-orange?style=for-the-badge" alt="JWT">
 </p>
 
-O **Task Manager** é uma plataforma robusta de produtividade que gerencia o ciclo de vida completo de tarefas. O projeto foi construído para demonstrar proficiência em operações **CRUD complexas**, autenticação segura e integração de serviços em nuvem.
+O **Task Manager** é uma aplicação **Full Stack** focada em produtividade, projetada para gerenciar o ciclo de vida completo de tarefas com **autenticação segura**, **operações CRUD avançadas** e **integração com serviços em nuvem**.
+
+O projeto foi desenvolvido com foco em **boas práticas de arquitetura**, **escalabilidade**, **segurança** e **automação**, sendo ideal para demonstrar domínio prático de um ecossistema moderno de desenvolvimento web.
 
 ---
 
-### 📸 Preview do Projeto
+## 📸 Preview do Projeto
 
 <p align="center">
   <img src="https://github.com/IagoRdgs/task-manager/blob/master/frontend/public/image.png" width="100%" alt="Dashboard Preview">
@@ -18,32 +22,180 @@ O **Task Manager** é uma plataforma robusta de produtividade que gerencia o cic
 
 ---
 
-### 🛠️ Stack Tecnológica & Arquitetura
+## 🚀 Funcionalidades
 
-Este projeto utiliza uma arquitetura desacoplada para garantir escalabilidade:
+### 🔐 Autenticação & Segurança
+- Cadastro de usuários
+- Login com JWT
+- Proteção de rotas via middleware
+- Hash de senha
+- Controle de sessão
 
-- **Frontend:** [React.js](https://reactjs.org/) + [Bootstrap](https://getbootstrap.com/) (Interface responsiva e limpa)
-- **Backend:** [Node.js](https://nodejs.org/) + [Express](https://expressjs.com/) (API RESTful)
-- **ORM:** [Prisma](https://www.prisma.io/) (Tipagem forte e queries otimizadas)
-- **Database:** [Supabase](https://supabase.com/) (PostgreSQL em nuvem)
-- **Segurança:** [JWT](https://jwt.io/) (JSON Web Tokens para sessões seguras)
-- **CI/CD:** [GitHub Actions](https://github.com/features/actions) (Automação de infraestrutura)
+### ✅ Gerenciamento de Tarefas
+- Criar, editar e excluir tarefas
+- Listagem por usuário autenticado
+- Marcação de status (pendente / concluída)
+- Validações no backend
+
+### 📊 Experiência do Usuário
+- Interface responsiva
+- Dashboard intuitivo
+- Componentes reutilizáveis
 
 ---
 
-### 📂 Estrutura do Projeto
+## 🛠️ Stack Tecnológica & Arquitetura
 
-```text
-task-manager/
-├── frontend/          # Aplicação React (Frontend)
-│   ├── src/
-│   │   ├── components/  # Componentes reutilizáveis
-│   │   ├── pages/       # Login, Dashboard, Cadastro
-│   │   └── api/    # Integração com API (Axios)
-├── api/          # API Node.js (Backend)
-│   ├── prisma/      # Schema do Banco de Dados
-│   ├── src/
-│   │   ├── controllers/ # Lógica de negócio
-│   │   ├── middleware/  # Filtros de Auth (JWT)
-│   │   └── routes/      # Endpoints da API
-└── .github/         # Automações (Keep Alive)
+### 🖥️ Frontend
+- React.js
+- Bootstrap
+- Axios
+
+### ⚙️ Backend
+- Node.js
+- Express
+- Prisma ORM
+
+### 🗄️ Banco de Dados
+- Supabase (PostgreSQL)
+
+### 🔒 Segurança
+- JWT (JSON Web Token)
+
+### 🔄 DevOps & Automação
+- GitHub Actions
+- CI/CD automatizado
+- Rotina automatizada para manter o banco ativo
+
+---
+
+## 📂 Estrutura do Projeto
+
+    task-manager/
+    ├── frontend/
+    │   ├── public/
+    │   └── src/
+    │       ├── components/
+    │       ├── pages/
+    │       ├── api/
+    │       └── styles/
+    │
+    ├── api/
+    │   ├── prisma/
+    │   └── src/
+    │       ├── controllers/
+    │       ├── middleware/
+    │       ├── routes/
+    │       └── services/
+    │
+    ├── .github/
+    │   └── workflows/
+    │       └── keep-alive.yml
+    │
+    └── README.md
+
+---
+
+## 🔌 Endpoints Principais da API
+
+### 🔐 Autenticação
+
+    POST /auth/register
+    POST /auth/login
+
+### ✅ Tarefas
+
+    GET    /tasks
+    POST   /tasks
+    PUT    /tasks/:id
+    DELETE /tasks/:id
+
+> 🔒 Todos os endpoints de tarefas exigem autenticação JWT.
+
+---
+
+## ⚙️ Pré-requisitos
+
+- Node.js 16+
+- npm ou yarn
+- Conta no Supabase
+
+---
+
+## 🔑 Variáveis de Ambiente
+
+    SUPABASE_URL=https://seu-projeto.supabase.co
+    SUPABASE_ANON_KEY=anon-key-do-supabase
+    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+    JWT_SECRET=sua_chave_secreta
+    PORT=3333
+
+---
+
+## ▶️ Como Executar Localmente
+
+### Backend
+
+    cd api
+    npm install
+    npx prisma migrate dev
+    npm run dev
+
+### Frontend
+
+    cd frontend
+    npm install
+    npm start
+
+Frontend: http://localhost:3000  
+API: http://localhost:3333  
+
+---
+
+## 🤖 GitHub Actions — Keep Alive (Supabase)
+
+Para evitar que o banco de dados do Supabase entre em modo de inatividade (idle), foi configurado um **workflow automatizado** utilizando **GitHub Actions**.
+
+Esse workflow executa periodicamente uma requisição simples à API ou ao banco de dados, garantindo que o serviço permaneça ativo mesmo em planos gratuitos.
+
+### Características
+- Execução agendada (cron)
+- Baixo consumo de recursos
+- Evita cold start / expiração do banco
+- Totalmente automatizado
+
+> Arquivo localizado em `.github/workflows/keep-alive.yml`
+
+---
+
+## 🚢 Deploy
+
+- Frontend: Vercel
+- Backend: Render / Railway
+- Database: Supabase
+- Automação: GitHub Actions
+
+---
+
+## 🧪 Boas Práticas
+
+- Arquitetura desacoplada
+- Separação de responsabilidades
+- Autenticação segura
+- ORM
+- CI/CD
+- Infra como código
+- Automação de serviços
+
+---
+
+## 👨‍💻 Autor
+
+**Iago Rodrigues**  
+GitHub: https://github.com/IagoRdgs
+
+---
+
+## 📄 Licença
+
+Licença **MIT** — uso livre 🚀
