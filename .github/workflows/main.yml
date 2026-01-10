@@ -2,25 +2,31 @@ name: Supabase Activity Keep Alive
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *' # Roda todo dia à meia-noite
   workflow_dispatch:
 
 jobs:
-  ping_db:
+  ping_supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Health Check Ping
+      - name: API Root Discovery Ping
         run: |
-          # Consultamos apenas a tabela de health_check
-          RESPONSE=$(curl -sS -i -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/health_check?select=id" \
+          # 1. Limpa a URL (remove barra final se houver)
+          CLEAN_URL=$(echo "${{ secrets.SUPABASE_URL }}" | sed 's/\/$//')
+          
+          # 2. Faz o ping na RAIZ da API (/rest/v1/)
+          # Isso não consulta tabelas, apenas verifica se a API está online.
+          # É uma operação legítima que impede a hibernação do projeto.
+          RESPONSE=$(curl -sS -i -X GET "$CLEAN_URL/rest/v1/" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
           
-          # Verifica se a resposta foi 200 OK
-          if echo "$RESPONSE" | grep -q "HTTP/1.1 200 OK" || echo "$RESPONSE" | grep -q "HTTP/2 200"; then
-            echo "✅ Atividade registrada com sucesso na tabela health_check."
+          # 3. Verifica se o servidor respondeu com sucesso (200 OK)
+          if echo "$RESPONSE" | grep -q "HTTP/.* 200"; then
+            echo "✅ Atividade registrada com sucesso. API está online."
           else
-            echo "❌ Falha no Ping. Verifique os logs abaixo:"
+            echo "❌ Erro ao contatar a API do Supabase."
+            echo "Resposta recebida:"
             echo "$RESPONSE"
             exit 1
           fi
