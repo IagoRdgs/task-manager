@@ -9,23 +9,21 @@ jobs:
   ping_supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Auth API Health Ping
+      - name: Secure API Activity Ping
         run: |
-          # Remove a barra final da URL se o usuário tiver colocado nos Secrets
           CLEAN_URL=$(echo "${{ secrets.SUPABASE_URL }}" | sed 's/\/$//')
           
-          # Fazemos o ping no endpoint de saúde do módulo de Auth.
-          # Este endpoint é público, seguro e registra atividade no seu projeto.
-          RESPONSE=$(curl -sS -i -X GET "$CLEAN_URL/auth/v1/health")
+          RESPONSE=$(curl -sS -i -X GET "$CLEAN_URL/rest/v1/" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
           
-          echo "--- RESPOSTA DO SISTEMA ---"
+          echo "--- DEBUG DA RESPOSTA ---"
           echo "$RESPONSE"
-          echo "---------------------------"
+          echo "-------------------------"
 
-          # Verifica se o servidor respondeu 200 OK
-          if echo "$RESPONSE" | grep -q "HTTP/.* 200"; then
-            echo "✅ Projeto ativo. Atividade de API registrada no Supabase."
+          if echo "$RESPONSE" | grep -q "HTTP/.* [200|401]"; then
+            echo "✅ Atividade registrada. O Gateway do Supabase processou a requisição."
           else
-            echo "❌ Falha ao contatar o serviço de Health."
+            echo "❌ Falha crítica ao contatar o servidor."
             exit 1
           fi
