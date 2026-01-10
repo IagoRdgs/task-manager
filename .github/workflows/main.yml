@@ -9,24 +9,23 @@ jobs:
   ping_supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: API Root Discovery Ping
+      - name: Auth API Health Ping
         run: |
-          # 1. Limpa a URL (remove barra final se houver)
+          # Remove a barra final da URL se o usuário tiver colocado nos Secrets
           CLEAN_URL=$(echo "${{ secrets.SUPABASE_URL }}" | sed 's/\/$//')
           
-          # 2. Faz o ping na RAIZ da API (/rest/v1/)
-          # Isso não consulta tabelas, apenas verifica se a API está online.
-          # É uma operação legítima que impede a hibernação do projeto.
-          RESPONSE=$(curl -sS -i -X GET "$CLEAN_URL/rest/v1/" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          # Fazemos o ping no endpoint de saúde do módulo de Auth.
+          # Este endpoint é público, seguro e registra atividade no seu projeto.
+          RESPONSE=$(curl -sS -i -X GET "$CLEAN_URL/auth/v1/health")
           
-          # 3. Verifica se o servidor respondeu com sucesso (200 OK)
+          echo "--- RESPOSTA DO SISTEMA ---"
+          echo "$RESPONSE"
+          echo "---------------------------"
+
+          # Verifica se o servidor respondeu 200 OK
           if echo "$RESPONSE" | grep -q "HTTP/.* 200"; then
-            echo "✅ Atividade registrada com sucesso. API está online."
+            echo "✅ Projeto ativo. Atividade de API registrada no Supabase."
           else
-            echo "❌ Erro ao contatar a API do Supabase."
-            echo "Resposta recebida:"
-            echo "$RESPONSE"
+            echo "❌ Falha ao contatar o serviço de Health."
             exit 1
           fi
