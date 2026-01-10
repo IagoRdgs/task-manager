@@ -1,22 +1,26 @@
-name: Debug Supabase Activity
+name: Supabase Activity Keep Alive
 
 on:
-  workflow_dispatch: # Vamos rodar manual para testar
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
-  debug_api:
+  ping_db:
     runs-on: ubuntu-latest
     steps:
-      - name: Check API Response
+      - name: Health Check Ping
         run: |
-          # Faz a requisição e salva o corpo da resposta
-          echo "Testando conexão com a tabela..."
-          
-          # Tente mudar 'profile' abaixo para o que você viu no Table Editor (ex: profiles ou Profile)
-          RESPONSE=$(curl -s -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/profile?select=*" \
+          # Consultamos apenas a tabela de health_check
+          RESPONSE=$(curl -sS -i -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/health_check?select=id" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Range: 0-0")
-
-          echo "Corpo da resposta do Supabase:"
-          echo "$RESPONSE"
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          
+          # Verifica se a resposta foi 200 OK
+          if echo "$RESPONSE" | grep -q "HTTP/1.1 200 OK" || echo "$RESPONSE" | grep -q "HTTP/2 200"; then
+            echo "✅ Atividade registrada com sucesso na tabela health_check."
+          else
+            echo "❌ Falha no Ping. Verifique os logs abaixo:"
+            echo "$RESPONSE"
+            exit 1
+          fi
