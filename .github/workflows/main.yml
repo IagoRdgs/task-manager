@@ -2,28 +2,37 @@ name: Supabase Activity Keep Alive
 
 on:
   schedule:
-    # Roda todo dia à meia-noite para garantir máxima segurança
+    # Roda todo dia à meia-noite para garantir que o projeto não hiberne
     - cron: '0 0 * * *'
-  workflow_dispatch: # Permite rodar manualmente para teste
+  workflow_dispatch: # Permite rodar manualmente a qualquer momento
 
 jobs:
-  check_users:
+  check_database:
     runs-on: ubuntu-latest
     steps:
-      - name: Get Users Count
+      - name: Get Profiles Count
         run: |
-          # Faz a requisição pedindo o count exato no Header
-          RESPONSE=$(curl -s -i -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/User?select=count" \
+          # 1. Faz a requisição pedindo o count exato no Header
+          # Usamos -s para silenciar o progresso do curl e -S para mostrar erros
+          RESPONSE=$(curl -sS -i -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/profile?select=count" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Prefer: count=exact")
           
-          # Exibe o status da resposta no log do GitHub para debug
-          echo "$RESPONSE"
-          
-          # Extrai o valor do header 'content-range' que o PostgREST usa para o count
+          # 2. Extrai o valor do header 'content-range' que contém o total (ex: 0-0/15)
+          # O 'tr -d' remove caracteres invisíveis que podem quebrar o log
           COUNT=$(echo "$RESPONSE" | grep -i 'content-range' | cut -d '/' -f 2 | tr -d '\r')
           
-          echo "----------------------------------------"
-          echo "Quantidade de usuários no banco: $COUNT"
-          echo "----------------------------------------"
+          # 3. Exibe o resultado de forma organizada
+          echo "=========================================="
+          if [ -z "$COUNT" ]; then
+            echo "❌ ERRO: Não foi possível obter a contagem."
+            echo "Verifique se o nome da tabela 'profile' está correto"
+            echo "ou se a URL/Key nos Secrets são válidas."
+            exit 1
+          else
+            echo "🚀 ATIVIDADE REGISTRADA COM SUCESSO"
+            echo "Tabela consultada: public.profile"
+            echo "Total de perfis encontrados: $COUNT"
+          fi
+          echo "=========================================="
