@@ -1,18 +1,29 @@
-name: Supabase Keep Alive
+name: Supabase Activity Keep Alive
 
 on:
   schedule:
-    # Roda às 00:00 de toda Segunda e Quinta-feira (Horário UTC)
-    # Isso garante atividade constante para evitar a pausa de 7 dias.
-    - cron: '0 0 * * 1,4'
-  workflow_dispatch: # Permite que você execute manualmente para testar
+    # Roda todo dia à meia-noite para garantir máxima segurança
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Permite rodar manualmente para teste
 
 jobs:
-  ping_db:
+  check_users:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase API
+      - name: Get Users Count
         run: |
-          curl -i -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/Task?select=*" \
-          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+          # Faz a requisição pedindo o count exato no Header
+          RESPONSE=$(curl -s -i -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/User?select=count" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Prefer: count=exact")
+          
+          # Exibe o status da resposta no log do GitHub para debug
+          echo "$RESPONSE"
+          
+          # Extrai o valor do header 'content-range' que o PostgREST usa para o count
+          COUNT=$(echo "$RESPONSE" | grep -i 'content-range' | cut -d '/' -f 2 | tr -d '\r')
+          
+          echo "----------------------------------------"
+          echo "Quantidade de usuários no banco: $COUNT"
+          echo "----------------------------------------"
